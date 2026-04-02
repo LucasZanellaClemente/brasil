@@ -1,5 +1,6 @@
 import { useState } from "react";
 import ProductModal from "@/components/ProductModal";
+import { createProductWhatsAppHref } from "@/lib/whatsapp";
 
 // Fotos da camisa amarela (substituir aqui)
 import camisaAmarela1 from "@/assets/camisa-amarela-1.jpeg";
@@ -11,9 +12,6 @@ import camisaAmarela4 from "@/assets/camisa-amarela-4.jpeg";
 import camisaAzul1 from "@/assets/camisa-azul-1.jpeg";
 import camisaAzul2 from "@/assets/camisa-azul-2.jpeg";
 import camisaAzul3 from "@/assets/camisa-azul-3.jpeg";
-
-// ⚠️ SUBSTITUA PELO SEU NÚMERO DO WHATSAPP (com código do país, sem +)
-const WHATSAPP_NUMBER = "5511989422080";
 
 const SIZES = ["P", "M", "L", "XL", "2XL", "3XL"] as const;
 const COLORS = [
@@ -72,23 +70,14 @@ function ProductCard({
   const images = PRODUCT_IMAGES[cardKey][selectedColor];
   const currentImage = images[0];
 
-  const whatsappHref = selectedSize
-    ? `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
-        `Olá! Tenho interesse na Camisa Brasil 2026 modelo ${colorLabel} tamanho ${selectedSize}. Pode me passar mais informações?`
-      )}`
-    : "#";
+  const whatsappHref = selectedSize ? createProductWhatsAppHref(colorLabel, selectedSize) : "#";
 
-  const handleCtaClick = (e: React.MouseEvent) => {
+  const handleCtaClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    if (selectedSize) return;
+
     e.preventDefault();
-    if (!selectedSize) {
-      setShaking(true);
-      setTimeout(() => setShaking(false), 500);
-      return;
-    }
-    const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
-      `Olá! Tenho interesse na Camisa Brasil 2026 modelo ${colorLabel} tamanho ${selectedSize}. Pode me passar mais informações?`
-    )}`;
-    window.open(url, "_blank", "noopener,noreferrer");
+    setShaking(true);
+    window.setTimeout(() => setShaking(false), 500);
   };
 
   return (
@@ -170,6 +159,7 @@ function ProductCard({
             target="_blank"
             rel="noopener noreferrer"
             onClick={handleCtaClick}
+            aria-disabled={!selectedSize}
             className={`w-full flex items-center justify-center gap-2 py-3.5 rounded-xl text-lg font-bold font-body transition-all duration-200 animate-whatsapp-pulse hover:brightness-110 ${ctaColor}`}
           >
             <WhatsAppIcon />
