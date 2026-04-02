@@ -6,7 +6,7 @@ import camisaAzul1 from "@/assets/camisa-azul-1.jpeg";
 import camisaAzul2 from "@/assets/camisa-azul-2.jpeg";
 
 // ⚠️ SUBSTITUA PELO SEU NÚMERO DO WHATSAPP (com código do país, sem +)
-const WHATSAPP_NUMBER = "5511999999999";
+const WHATSAPP_NUMBER = "5511989422080";
 
 const SIZES = ["P", "M", "L", "XL", "2XL", "3XL"] as const;
 const COLORS = [
