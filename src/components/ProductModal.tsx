@@ -100,12 +100,12 @@ export default function ProductModal({
         </div>
 
         {/* Thumbnails */}
-        <div className="flex gap-2 p-4 justify-center overflow-x-auto">
+        <div className="flex gap-2 px-4 py-3 justify-center overflow-x-auto bg-card border-t border-border">
           {images.map((img, i) => (
             <button
               key={i}
               onClick={() => setCurrentIndex(i)}
-              className={`w-16 h-16 md:w-20 md:h-20 rounded-lg overflow-hidden border-2 transition-all flex-shrink-0 ${
+              className={`w-14 h-14 md:w-16 md:h-16 rounded-lg overflow-hidden border-2 transition-all flex-shrink-0 ${
                 i === currentIndex ? "border-accent scale-105" : "border-transparent opacity-60 hover:opacity-100"
               }`}
             >

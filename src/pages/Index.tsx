@@ -79,11 +79,16 @@ function ProductCard({
     : "#";
 
   const handleCtaClick = (e: React.MouseEvent) => {
+    e.preventDefault();
     if (!selectedSize) {
-      e.preventDefault();
       setShaking(true);
       setTimeout(() => setShaking(false), 500);
+      return;
     }
+    const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
+      `Olá! Tenho interesse na Camisa Brasil 2026 modelo ${colorLabel} tamanho ${selectedSize}. Pode me passar mais informações?`
+    )}`;
+    window.open(url, "_blank", "noopener,noreferrer");
   };
 
   return (
