@@ -78,7 +78,7 @@ export default function ProductModal({
         </div>
 
         {/* Main image + navigation */}
-        <div className="relative aspect-[3/4] md:aspect-[4/3] bg-muted overflow-hidden">
+        <div className="relative aspect-square md:aspect-[4/3] bg-muted overflow-hidden">
           <img
             src={images[currentIndex]}
             alt={`${name} - foto ${currentIndex + 1}`}
