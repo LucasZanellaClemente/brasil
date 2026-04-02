@@ -6,7 +6,6 @@ import camisaAmarela1 from "@/assets/camisa-amarela-1.jpeg";
 import camisaAmarela2 from "@/assets/camisa-amarela-2.jpeg";
 import camisaAmarela3 from "@/assets/camisa-amarela-3.jpeg";
 import camisaAmarela4 from "@/assets/camisa-amarela-4.jpeg";
-import camisaAmarela5 from "@/assets/camisa-amarela-5.jpeg";
 
 // Fotos da camisa azul (substituir aqui)
 import camisaAzul1 from "@/assets/camisa-azul-1.jpeg";
@@ -33,13 +32,11 @@ const WhatsAppIcon = () => (
 /* ── Product images map ── */
 const PRODUCT_IMAGES: Record<string, { amarelo: string[]; azul: string[] }> = {
   card1: {
-    // foto-amarela-1, foto-amarela-2, foto-amarela-3 (galeria camisa amarela)
-    amarelo: [camisaAmarela1, camisaAmarela2, camisaAmarela3, camisaAmarela4, camisaAmarela5],
-    // foto-azul-1, foto-azul-2, foto-azul-3 (galeria camisa azul)
+    amarelo: [camisaAmarela1, camisaAmarela2, camisaAmarela3, camisaAmarela4],
     azul: [camisaAzul1, camisaAzul2, camisaAzul3],
   },
   card2: {
-    amarelo: [camisaAmarela1, camisaAmarela2, camisaAmarela3, camisaAmarela4, camisaAmarela5],
+    amarelo: [camisaAmarela1, camisaAmarela2, camisaAmarela3, camisaAmarela4],
     azul: [camisaAzul1, camisaAzul2, camisaAzul3],
   },
 };
