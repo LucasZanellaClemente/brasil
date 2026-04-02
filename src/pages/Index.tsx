@@ -2,22 +2,23 @@ import { useState } from "react";
 import ProductModal from "@/components/ProductModal";
 import { createProductWhatsAppHref } from "@/lib/whatsapp";
 
-// Fotos da camisa amarela (substituir aqui)
-import camisaAmarela1 from "@/assets/camisa-amarela-1.jpeg";
-import camisaAmarela2 from "@/assets/camisa-amarela-2.jpeg";
-import camisaAmarela3 from "@/assets/camisa-amarela-3.jpeg";
-import camisaAmarela4 from "@/assets/camisa-amarela-4.jpeg";
+// ✅ Fotos da camisa AMARELA
+import camisaAmarela1 from "@/assets/amarela-principal.jpeg";
+import camisaAmarela2 from "@/assets/amarela.jpeg";
+import camisaAmarela3 from "@/assets/camisa-amarela-1.jpeg";
+import camisaAmarela4 from "@/assets/camisa-amarela-3.jpeg";
+import camisaAmarela5 from "@/assets/camisa-amarela-costas.jpeg";
 
-// Fotos da camisa azul (substituir aqui)
+// ✅ Fotos da camisa AZUL
 import camisaAzul1 from "@/assets/camisa-azul-1.jpeg";
 import camisaAzul2 from "@/assets/camisa-azul-2.jpeg";
 import camisaAzul3 from "@/assets/camisa-azul-3.jpeg";
+import camisaAzul4 from "@/assets/camisa-azul-4.jpeg";
+import camisaAzul5 from "@/assets/camiseta-azul-5.jpeg";
+import camisaAzul6 from "@/assets/azul-manequim.jpeg";
+import camisaAzul7 from "@/assets/azul (2).jpeg";
 
 const SIZES = ["P", "M", "L", "XL", "2XL", "3XL"] as const;
-const COLORS = [
-  { id: "amarelo", label: "Amarelo", hex: "#FFDF00" },
-  { id: "azul", label: "Azul", hex: "#002776" },
-] as const;
 
 type ColorId = "amarelo" | "azul";
 
@@ -27,19 +28,17 @@ const WhatsAppIcon = () => (
   </svg>
 );
 
-/* ── Product images map ── */
 const PRODUCT_IMAGES: Record<string, { amarelo: string[]; azul: string[] }> = {
   card1: {
-    amarelo: [camisaAmarela1, camisaAmarela2, camisaAmarela3, camisaAmarela4],
-    azul: [camisaAzul1, camisaAzul2, camisaAzul3],
+    amarelo: [camisaAmarela1, camisaAmarela2, camisaAmarela3, camisaAmarela4, camisaAmarela5],
+    azul: [camisaAzul1, camisaAzul2, camisaAzul3, camisaAzul4, camisaAzul5, camisaAzul6, camisaAzul7],
   },
   card2: {
-    amarelo: [camisaAmarela1, camisaAmarela2, camisaAmarela3, camisaAmarela4],
-    azul: [camisaAzul1, camisaAzul2, camisaAzul3],
+    amarelo: [camisaAmarela1, camisaAmarela2, camisaAmarela3, camisaAmarela4, camisaAmarela5],
+    azul: [camisaAzul1, camisaAzul2, camisaAzul3, camisaAzul4, camisaAzul5, camisaAzul6, camisaAzul7],
   },
 };
 
-/* ── Product Card ── */
 interface ProductCardProps {
   cardKey: string;
   name: string;
@@ -51,30 +50,19 @@ interface ProductCardProps {
   animationClass: string;
 }
 
-function ProductCard({
-  cardKey,
-  name,
-  badge,
-  badgeColor,
-  price,
-  defaultColor,
-  ctaColor,
-  animationClass,
-}: ProductCardProps) {
+function ProductCard({ cardKey, name, badge, badgeColor, price, defaultColor, ctaColor, animationClass }: ProductCardProps) {
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
-  const [selectedColor, setSelectedColor] = useState<ColorId>(defaultColor);
   const [shaking, setShaking] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
 
-  const colorLabel = COLORS.find((c) => c.id === selectedColor)?.label ?? "";
-  const images = PRODUCT_IMAGES[cardKey][selectedColor];
+  const colorLabel = defaultColor === "amarelo" ? "Amarelo" : "Azul";
+  const images = PRODUCT_IMAGES[cardKey][defaultColor];
   const currentImage = images[0];
 
   const whatsappHref = selectedSize ? createProductWhatsAppHref(colorLabel, selectedSize) : "#";
 
   const handleCtaClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     if (selectedSize) return;
-
     e.preventDefault();
     setShaking(true);
     window.setTimeout(() => setShaking(false), 500);
@@ -83,11 +71,7 @@ function ProductCard({
   return (
     <>
       <div className={`bg-card rounded-2xl overflow-hidden border border-border ${animationClass}`}>
-        {/* Image — click to open modal */}
-        <div
-          className="relative aspect-[3/4] overflow-hidden bg-muted cursor-pointer group"
-          onClick={() => setModalOpen(true)}
-        >
+        <div className="relative aspect-[3/4] overflow-hidden bg-muted cursor-pointer group" onClick={() => setModalOpen(true)}>
           <img
             id={`foto-camisa-${defaultColor === "amarelo" ? "amarela" : "azul"}`}
             src={currentImage}
@@ -100,7 +84,6 @@ function ProductCard({
           >
             {badge}
           </span>
-          {/* "Ver detalhes" overlay */}
           <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
             <span className="px-4 py-2 bg-background/90 rounded-full font-body font-semibold text-foreground text-sm">
               🔍 Ver detalhes
@@ -108,12 +91,10 @@ function ProductCard({
           </div>
         </div>
 
-        {/* Details */}
         <div className="p-5 md:p-6 space-y-4">
           <h3 className="font-display text-2xl md:text-3xl tracking-wide text-foreground">{name}</h3>
           <p className="font-display text-3xl md:text-4xl text-accent">{price}</p>
 
-          {/* Size selector */}
           <div className={shaking ? "animate-shake" : ""}>
             <p className="text-sm font-body text-muted-foreground mb-2">
               Tamanho {!selectedSize && <span className="text-destructive">*</span>}
@@ -135,25 +116,6 @@ function ProductCard({
             </div>
           </div>
 
-          {/* Color selector */}
-          <div>
-            <p className="text-sm font-body text-muted-foreground mb-2">Cor</p>
-            <div className="flex gap-3">
-              {COLORS.map((color) => (
-                <button
-                  key={color.id}
-                  onClick={() => setSelectedColor(color.id)}
-                  className={`w-9 h-9 rounded-full border-2 transition-all duration-200 ${
-                    selectedColor === color.id ? "border-foreground scale-110" : "border-transparent"
-                  }`}
-                  style={{ backgroundColor: color.hex }}
-                  aria-label={color.label}
-                />
-              ))}
-            </div>
-          </div>
-
-          {/* WhatsApp CTA — now an <a> tag */}
           <a
             href={whatsappHref}
             target="_blank"
@@ -168,7 +130,6 @@ function ProductCard({
         </div>
       </div>
 
-      {/* Product Detail Modal */}
       <ProductModal
         open={modalOpen}
         onClose={() => setModalOpen(false)}
@@ -183,11 +144,9 @@ function ProductCard({
   );
 }
 
-/* ── Page ── */
 const Index = () => {
   return (
     <div className="min-h-screen bg-background bg-diamond-pattern">
-      {/* Hero Section */}
       <section className="relative py-16 md:py-24 px-4 text-center overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/50 to-background pointer-events-none" />
         <div className="relative z-10 max-w-4xl mx-auto space-y-6 animate-fade-slide-up">
@@ -203,10 +162,8 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Products Section */}
       <section className="max-w-5xl mx-auto px-4 pb-16 md:pb-24">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
-          {/* CARD 1 — CAMISA AMARELA */}
           <ProductCard
             cardKey="card1"
             name="Camisa Brasil 2026 — Modelo Amarelo"
@@ -217,7 +174,6 @@ const Index = () => {
             ctaColor="bg-brasil-green text-white"
             animationClass="animate-fade-slide-up"
           />
-          {/* CARD 2 — CAMISA AZUL */}
           <ProductCard
             cardKey="card2"
             name="Camisa Brasil 2026 — Modelo Azul"
@@ -231,7 +187,6 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Trust Badges */}
       <section className="border-t border-border py-10 px-4">
         <div className="max-w-3xl mx-auto flex flex-col md:flex-row items-center justify-center gap-6 md:gap-10 text-muted-foreground font-body text-sm md:text-base">
           <span>✅ Entrega rápida</span>
@@ -240,7 +195,6 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Footer */}
       <footer className="py-6 text-center font-body text-sm text-muted-foreground">
         © 2026 · Feito com 💚 para a torcida brasileira
       </footer>

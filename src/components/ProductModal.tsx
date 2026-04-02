@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { createProductWhatsAppHref } from "@/lib/whatsapp";
-import { ChevronLeft, ChevronRight, X } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 const SIZES = ["P", "M", "L", "XL", "2XL", "3XL"] as const;
 
@@ -36,22 +36,30 @@ export default function ProductModal({
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [shaking, setShaking] = useState(false);
 
+  // ✅ FIX: reseta index sempre que as imagens mudarem (troca de cor) ou modal fechar
   useEffect(() => {
     setCurrentIndex(0);
+  }, [images]);
 
+  useEffect(() => {
     if (!open) {
       setSelectedSize(null);
+      setCurrentIndex(0);
     }
-  }, [open, images]);
+  }, [open]);
+
+  // Garante que o index nunca ultrapasse o tamanho do array atual
+  const safeIndex = currentIndex < images.length ? currentIndex : 0;
 
   const goNext = () => setCurrentIndex((i) => (i + 1) % images.length);
   const goPrev = () => setCurrentIndex((i) => (i - 1 + images.length) % images.length);
 
-  const whatsappHref = selectedSize ? createProductWhatsAppHref(colorLabel, selectedSize) : "#";
+  const whatsappHref = selectedSize
+    ? createProductWhatsAppHref(colorLabel, selectedSize)
+    : "#";
 
   const handleCtaClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     if (selectedSize) return;
-
     e.preventDefault();
     setShaking(true);
     window.setTimeout(() => setShaking(false), 500);
@@ -59,70 +67,74 @@ export default function ProductModal({
 
   return (
     <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
-      <DialogContent className="flex w-[95vw] max-w-4xl max-h-[90vh] flex-col overflow-hidden bg-card border-border p-0">
-        {/* Hidden accessible title */}
+      <DialogContent className="flex w-[95vw] max-w-3xl max-h-[92vh] flex-col overflow-hidden bg-card border-border p-0">
         <DialogTitle className="sr-only">{name}</DialogTitle>
 
         {/* Header */}
-        <div className="flex items-center justify-between p-4 md:p-6 border-b border-border">
-          <div className="flex items-center gap-3">
-            <span
-              className="px-3 py-1.5 rounded-full text-sm font-bold font-body"
-              style={{ backgroundColor: badgeColor, color: badgeColor === "#FFDF00" ? "#0a0a1a" : "#fff" }}
-            >
-              {badge}
-            </span>
-            <h2 className="font-display text-xl md:text-2xl tracking-wide text-foreground">{name}</h2>
-          </div>
+        <div className="flex items-center gap-3 p-4 md:p-5 border-b border-border shrink-0">
+          <span
+            className="px-3 py-1.5 rounded-full text-sm font-bold font-body whitespace-nowrap"
+            style={{ backgroundColor: badgeColor, color: badgeColor === "#FFDF00" ? "#0a0a1a" : "#fff" }}
+          >
+            {badge}
+          </span>
+          <h2 className="font-display text-xl md:text-2xl tracking-wide text-foreground">{name}</h2>
         </div>
 
-        {/* Main image + navigation */}
-        <div className="flex min-h-0 flex-1 flex-col bg-muted">
-          <div className="relative flex min-h-[260px] flex-1 items-center justify-center overflow-hidden bg-muted">
-            <img
-              src={images[currentIndex]}
-              alt={`${name} - foto ${currentIndex + 1}`}
-              className="max-h-full w-full object-contain p-4 md:p-6"
-            />
-            {/* Nav arrows */}
+        {/* ✅ FIX: imagem centralizada com altura fixa */}
+        <div className="relative w-full bg-muted flex items-center justify-center overflow-hidden shrink-0" style={{ height: "340px" }}>
+          <img
+            key={safeIndex} // força re-render ao trocar imagem
+            src={images[safeIndex]}
+            alt={`${name} - foto ${safeIndex + 1}`}
+            className="h-full w-full object-contain p-4"
+          />
+
+          {/* Seta esquerda */}
+          {images.length > 1 && (
             <button
               type="button"
               onClick={goPrev}
-              className="absolute left-2 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-background/70 text-foreground backdrop-blur transition hover:bg-background"
+              className="absolute left-2 top-1/2 -translate-y-1/2 flex h-9 w-9 items-center justify-center rounded-full bg-background/80 text-foreground backdrop-blur transition hover:bg-background"
             >
               <ChevronLeft className="w-5 h-5" />
             </button>
+          )}
+
+          {/* Seta direita */}
+          {images.length > 1 && (
             <button
               type="button"
               onClick={goNext}
-              className="absolute right-2 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-background/70 text-foreground backdrop-blur transition hover:bg-background"
+              className="absolute right-2 top-1/2 -translate-y-1/2 flex h-9 w-9 items-center justify-center rounded-full bg-background/80 text-foreground backdrop-blur transition hover:bg-background"
             >
               <ChevronRight className="w-5 h-5" />
             </button>
-          </div>
+          )}
+        </div>
 
-          {/* Thumbnails */}
-          <div className="shrink-0 border-t border-border bg-card px-4 py-3">
-            <div className="flex justify-center gap-2 overflow-x-auto pb-1">
-              {images.map((img, i) => (
-                <button
-                  key={i}
-                  type="button"
-                  onClick={() => setCurrentIndex(i)}
-                  className={`h-14 w-14 flex-shrink-0 overflow-hidden rounded-lg border-2 transition-all md:h-16 md:w-16 ${
-                    i === currentIndex ? "border-accent scale-105" : "border-transparent opacity-60 hover:opacity-100"
-                  }`}
-                >
-                  <img src={img} alt={`Miniatura ${i + 1}`} className="w-full h-full object-cover" />
-                </button>
-              ))}
-            </div>
+        {/* ✅ FIX: miniaturas apenas das imagens do produto correto */}
+        <div className="shrink-0 border-t border-border bg-card px-4 py-3">
+          <div className="flex justify-center gap-2 overflow-x-auto pb-1">
+            {images.map((img, i) => (
+              <button
+                key={`${colorLabel}-${i}`} // key com colorLabel evita miniaturas erradas
+                type="button"
+                onClick={() => setCurrentIndex(i)}
+                className={`h-14 w-14 flex-shrink-0 overflow-hidden rounded-lg border-2 transition-all md:h-16 md:w-16 ${
+                  i === safeIndex
+                    ? "border-accent scale-105"
+                    : "border-transparent opacity-60 hover:opacity-100"
+                }`}
+              >
+                <img src={img} alt={`Miniatura ${i + 1}`} className="w-full h-full object-cover" />
+              </button>
+            ))}
           </div>
         </div>
 
-        {/* Size selector + CTA */}
-        <div className="shrink-0 border-t border-border p-4 md:p-6 space-y-4">
-          {/* Size selector */}
+        {/* Tamanho + botão WhatsApp */}
+        <div className="shrink-0 border-t border-border p-4 md:p-5 space-y-4">
           <div className={shaking ? "animate-shake" : ""}>
             <p className="text-sm font-body text-muted-foreground mb-2">
               Tamanho {!selectedSize && <span className="text-destructive">*</span>}
@@ -144,14 +156,13 @@ export default function ProductModal({
             </div>
           </div>
 
-          {/* WhatsApp CTA */}
           <a
             href={whatsappHref}
             target="_blank"
             rel="noopener noreferrer"
             onClick={handleCtaClick}
             aria-disabled={!selectedSize}
-            className={`w-full flex items-center justify-center gap-2 py-3.5 rounded-xl text-lg font-bold font-body transition-all duration-200 animate-whatsapp-pulse hover:brightness-110 ${ctaColor}`}
+            className={`w-full flex items-center justify-center gap-2 py-3.5 rounded-xl text-lg font-bold font-body transition-all duration-200 hover:brightness-110 ${ctaColor}`}
           >
             <WhatsAppIcon />
             💬 QUERO ESSA CAMISA
