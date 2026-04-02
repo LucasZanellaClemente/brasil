@@ -6,7 +6,6 @@ import camisaAmarela1 from "@/assets/camisa-amarela-1.jpeg";
 import camisaAmarela2 from "@/assets/camisa-amarela-2.jpeg";
 import camisaAmarela3 from "@/assets/camisa-amarela-3.jpeg";
 import camisaAmarela4 from "@/assets/camisa-amarela-4.jpeg";
-import camisaAmarela5 from "@/assets/camisa-amarela-5.jpeg";
 
 // Fotos da camisa azul (substituir aqui)
 import camisaAzul1 from "@/assets/camisa-azul-1.jpeg";
