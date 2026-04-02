@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { createProductWhatsAppHref } from "@/lib/whatsapp";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
 
 const SIZES = ["P", "M", "L", "XL", "2XL", "3XL"] as const;
-const WHATSAPP_NUMBER = "5511989422080";
 
 interface ProductModalProps {
   open: boolean;
@@ -36,31 +36,30 @@ export default function ProductModal({
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [shaking, setShaking] = useState(false);
 
+  useEffect(() => {
+    setCurrentIndex(0);
+
+    if (!open) {
+      setSelectedSize(null);
+    }
+  }, [open, images]);
+
   const goNext = () => setCurrentIndex((i) => (i + 1) % images.length);
   const goPrev = () => setCurrentIndex((i) => (i - 1 + images.length) % images.length);
 
-  const whatsappHref = selectedSize
-    ? `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
-        `Olá! Tenho interesse na Camisa Brasil 2026 modelo ${colorLabel} tamanho ${selectedSize}. Pode me passar mais informações?`
-      )}`
-    : "#";
+  const whatsappHref = selectedSize ? createProductWhatsAppHref(colorLabel, selectedSize) : "#";
 
-  const handleCtaClick = (e: React.MouseEvent) => {
+  const handleCtaClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    if (selectedSize) return;
+
     e.preventDefault();
-    if (!selectedSize) {
-      setShaking(true);
-      setTimeout(() => setShaking(false), 500);
-      return;
-    }
-    const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
-      `Olá! Tenho interesse na Camisa Brasil 2026 modelo ${colorLabel} tamanho ${selectedSize}. Pode me passar mais informações?`
-    )}`;
-    window.open(url, "_blank", "noopener,noreferrer");
+    setShaking(true);
+    window.setTimeout(() => setShaking(false), 500);
   };
 
   return (
     <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
-      <DialogContent className="max-w-3xl w-[95vw] max-h-[90vh] overflow-y-auto bg-card border-border p-0">
+      <DialogContent className="flex w-[95vw] max-w-4xl max-h-[90vh] flex-col overflow-hidden bg-card border-border p-0">
         {/* Hidden accessible title */}
         <DialogTitle className="sr-only">{name}</DialogTitle>
 
@@ -78,44 +77,51 @@ export default function ProductModal({
         </div>
 
         {/* Main image + navigation */}
-        <div className="relative aspect-square md:aspect-[4/3] bg-muted overflow-hidden">
-          <img
-            src={images[currentIndex]}
-            alt={`${name} - foto ${currentIndex + 1}`}
-            className="w-full h-full object-contain"
-          />
-          {/* Nav arrows */}
-          <button
-            onClick={goPrev}
-            className="absolute left-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-background/70 backdrop-blur flex items-center justify-center text-foreground hover:bg-background transition"
-          >
-            <ChevronLeft className="w-5 h-5" />
-          </button>
-          <button
-            onClick={goNext}
-            className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-background/70 backdrop-blur flex items-center justify-center text-foreground hover:bg-background transition"
-          >
-            <ChevronRight className="w-5 h-5" />
-          </button>
-        </div>
-
-        {/* Thumbnails */}
-        <div className="flex gap-2 px-4 py-3 justify-center overflow-x-auto bg-card border-t border-border">
-          {images.map((img, i) => (
+        <div className="flex min-h-0 flex-1 flex-col bg-muted">
+          <div className="relative flex min-h-[260px] flex-1 items-center justify-center overflow-hidden bg-muted">
+            <img
+              src={images[currentIndex]}
+              alt={`${name} - foto ${currentIndex + 1}`}
+              className="max-h-full w-full object-contain p-4 md:p-6"
+            />
+            {/* Nav arrows */}
             <button
-              key={i}
-              onClick={() => setCurrentIndex(i)}
-              className={`w-14 h-14 md:w-16 md:h-16 rounded-lg overflow-hidden border-2 transition-all flex-shrink-0 ${
-                i === currentIndex ? "border-accent scale-105" : "border-transparent opacity-60 hover:opacity-100"
-              }`}
+              type="button"
+              onClick={goPrev}
+              className="absolute left-2 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-background/70 text-foreground backdrop-blur transition hover:bg-background"
             >
-              <img src={img} alt={`Miniatura ${i + 1}`} className="w-full h-full object-cover" />
+              <ChevronLeft className="w-5 h-5" />
             </button>
-          ))}
+            <button
+              type="button"
+              onClick={goNext}
+              className="absolute right-2 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-background/70 text-foreground backdrop-blur transition hover:bg-background"
+            >
+              <ChevronRight className="w-5 h-5" />
+            </button>
+          </div>
+
+          {/* Thumbnails */}
+          <div className="shrink-0 border-t border-border bg-card px-4 py-3">
+            <div className="flex justify-center gap-2 overflow-x-auto pb-1">
+              {images.map((img, i) => (
+                <button
+                  key={i}
+                  type="button"
+                  onClick={() => setCurrentIndex(i)}
+                  className={`h-14 w-14 flex-shrink-0 overflow-hidden rounded-lg border-2 transition-all md:h-16 md:w-16 ${
+                    i === currentIndex ? "border-accent scale-105" : "border-transparent opacity-60 hover:opacity-100"
+                  }`}
+                >
+                  <img src={img} alt={`Miniatura ${i + 1}`} className="w-full h-full object-cover" />
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
 
         {/* Size selector + CTA */}
-        <div className="p-4 md:p-6 space-y-4 border-t border-border">
+        <div className="shrink-0 border-t border-border p-4 md:p-6 space-y-4">
           {/* Size selector */}
           <div className={shaking ? "animate-shake" : ""}>
             <p className="text-sm font-body text-muted-foreground mb-2">
@@ -144,6 +150,7 @@ export default function ProductModal({
             target="_blank"
             rel="noopener noreferrer"
             onClick={handleCtaClick}
+            aria-disabled={!selectedSize}
             className={`w-full flex items-center justify-center gap-2 py-3.5 rounded-xl text-lg font-bold font-body transition-all duration-200 animate-whatsapp-pulse hover:brightness-110 ${ctaColor}`}
           >
             <WhatsAppIcon />
