@@ -198,7 +198,7 @@ const Index = () => {
             VISTA A <span className="text-accent">SELEÇÃO</span>
           </h1>
           <p className="font-body text-lg md:text-xl text-muted-foreground max-w-xl mx-auto">
-            Camisas oficiais da Copa do Mundo · Entrega rápida
+            Camisas do Brasil para a Copa do Mundo · Entrega rápida
           </p>
         </div>
       </section>
