@@ -8,6 +8,7 @@ import camisaAmarela2 from "@/assets/amarela.jpeg";
 import camisaAmarela3 from "@/assets/camisa-amarela-1.jpeg";
 import camisaAmarela4 from "@/assets/camisa-amarela-3.jpeg";
 import camisaAmarela5 from "@/assets/camisa-amarela-costas.jpeg";
+import camisetaAmarela from "@/assets/camiseta-amarela.mp4";
 
 // ✅ Fotos da camisa AZUL
 import camisaAzul1 from "@/assets/camisa-azul-1.jpeg";
@@ -17,27 +18,46 @@ import camisaAzul4 from "@/assets/camisa-azul-4.jpeg";
 import camisaAzul5 from "@/assets/camiseta-azul-5.jpeg";
 import camisaAzul6 from "@/assets/azul-manequim.jpeg";
 import camisaAzul7 from "@/assets/azul (2).jpeg";
+import camisetaAzul from "@/assets/camiseta-azul.mp4";
 
 const SIZES = ["P", "M", "L", "XL", "2XL", "3XL"] as const;
 
 type ColorId = "amarelo" | "azul";
+
+// ✅ Cada produto tem imagens e um vídeo separados
+export interface ProductMedia {
+  images: string[];
+  video: string;
+}
+
+const PRODUCT_MEDIA: Record<string, { amarelo: ProductMedia; azul: ProductMedia }> = {
+  card1: {
+    amarelo: {
+      images: [camisaAmarela1, camisaAmarela2, camisaAmarela3, camisaAmarela4, camisaAmarela5],
+      video: camisetaAmarela,
+    },
+    azul: {
+      images: [camisaAzul1, camisaAzul2, camisaAzul3, camisaAzul4, camisaAzul5, camisaAzul6, camisaAzul7],
+      video: camisetaAzul,
+    },
+  },
+  card2: {
+    amarelo: {
+      images: [camisaAmarela1, camisaAmarela2, camisaAmarela3, camisaAmarela4, camisaAmarela5],
+      video: camisetaAmarela,
+    },
+    azul: {
+      images: [camisaAzul1, camisaAzul2, camisaAzul3, camisaAzul4, camisaAzul5, camisaAzul6, camisaAzul7],
+      video: camisetaAzul,
+    },
+  },
+};
 
 const WhatsAppIcon = () => (
   <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
     <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
   </svg>
 );
-
-const PRODUCT_IMAGES: Record<string, { amarelo: string[]; azul: string[] }> = {
-  card1: {
-    amarelo: [camisaAmarela1, camisaAmarela2, camisaAmarela3, camisaAmarela4, camisaAmarela5],
-    azul: [camisaAzul1, camisaAzul2, camisaAzul3, camisaAzul4, camisaAzul5, camisaAzul6, camisaAzul7],
-  },
-  card2: {
-    amarelo: [camisaAmarela1, camisaAmarela2, camisaAmarela3, camisaAmarela4, camisaAmarela5],
-    azul: [camisaAzul1, camisaAzul2, camisaAzul3, camisaAzul4, camisaAzul5, camisaAzul6, camisaAzul7],
-  },
-};
 
 interface ProductCardProps {
   cardKey: string;
@@ -56,8 +76,8 @@ function ProductCard({ cardKey, name, badge, badgeColor, price, defaultColor, ct
   const [modalOpen, setModalOpen] = useState(false);
 
   const colorLabel = defaultColor === "amarelo" ? "Amarelo" : "Azul";
-  const images = PRODUCT_IMAGES[cardKey][defaultColor];
-  const currentImage = images[0];
+  const media = PRODUCT_MEDIA[cardKey][defaultColor];
+  const currentImage = media.images[0];
 
   const whatsappHref = selectedSize ? createProductWhatsAppHref(colorLabel, selectedSize) : "#";
 
@@ -137,7 +157,8 @@ function ProductCard({ cardKey, name, badge, badgeColor, price, defaultColor, ct
         badge={badge}
         badgeColor={badgeColor}
         colorLabel={colorLabel}
-        images={images}
+        images={media.images}
+        video={media.video}
         ctaColor={ctaColor}
       />
     </>
@@ -169,7 +190,7 @@ const Index = () => {
             name="Camisa Brasil 2026 — Modelo Amarelo"
             badge="AMARELINHA ⭐"
             badgeColor="#FFDF00"
-            price="R$ 149,90"
+            price="R$ 159,90"
             defaultColor="amarelo"
             ctaColor="bg-brasil-green text-white"
             animationClass="animate-fade-slide-up"
@@ -179,7 +200,7 @@ const Index = () => {
             name="Camisa Brasil 2026 — Modelo Azul"
             badge="AZUL CELESTE 💙"
             badgeColor="#002776"
-            price="R$ 149,90"
+            price="R$ 159,90"
             defaultColor="azul"
             ctaColor="bg-brasil-blue text-white"
             animationClass="animate-fade-slide-up-delay"

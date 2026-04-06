@@ -13,6 +13,7 @@ interface ProductModalProps {
   badgeColor: string;
   colorLabel: string;
   images: string[];
+  video: string;
   ctaColor: string;
 }
 
@@ -22,6 +23,9 @@ const WhatsAppIcon = () => (
   </svg>
 );
 
+// ✅ "video" é um índice especial para o vídeo
+const VIDEO_INDEX = -1;
+
 export default function ProductModal({
   open,
   onClose,
@@ -30,29 +34,50 @@ export default function ProductModal({
   badgeColor,
   colorLabel,
   images,
+  video,
   ctaColor,
 }: ProductModalProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [showVideo, setShowVideo] = useState(false);
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [shaking, setShaking] = useState(false);
 
-  // ✅ FIX: reseta index sempre que as imagens mudarem (troca de cor) ou modal fechar
   useEffect(() => {
     setCurrentIndex(0);
+    setShowVideo(false);
   }, [images]);
 
   useEffect(() => {
     if (!open) {
       setSelectedSize(null);
       setCurrentIndex(0);
+      setShowVideo(false);
     }
   }, [open]);
 
-  // Garante que o index nunca ultrapasse o tamanho do array atual
-  const safeIndex = currentIndex < images.length ? currentIndex : 0;
+  const totalItems = images.length + 1; // imagens + 1 vídeo
 
-  const goNext = () => setCurrentIndex((i) => (i + 1) % images.length);
-  const goPrev = () => setCurrentIndex((i) => (i - 1 + images.length) % images.length);
+  const goNext = () => {
+    if (showVideo) {
+      setShowVideo(false);
+      setCurrentIndex(0);
+    } else if (currentIndex < images.length - 1) {
+      setCurrentIndex((i) => i + 1);
+    } else {
+      setShowVideo(true);
+    }
+  };
+
+  const goPrev = () => {
+    if (showVideo) {
+      setShowVideo(false);
+      setCurrentIndex(images.length - 1);
+    } else if (currentIndex > 0) {
+      setCurrentIndex((i) => i - 1);
+    } else {
+      setShowVideo(true);
+    }
+  };
 
   const whatsappHref = selectedSize
     ? createProductWhatsAppHref(colorLabel, selectedSize)
@@ -81,48 +106,57 @@ export default function ProductModal({
           <h2 className="font-display text-xl md:text-2xl tracking-wide text-foreground">{name}</h2>
         </div>
 
-        {/* ✅ FIX: imagem centralizada com altura fixa */}
+        {/* Área principal — imagem ou vídeo */}
         <div className="relative w-full bg-muted flex items-center justify-center overflow-hidden shrink-0" style={{ height: "340px" }}>
-          <img
-            key={safeIndex} // força re-render ao trocar imagem
-            src={images[safeIndex]}
-            alt={`${name} - foto ${safeIndex + 1}`}
-            className="h-full w-full object-contain p-4"
-          />
+          {showVideo ? (
+            // ✅ Renderiza vídeo
+            <video
+              key={video}
+              src={video}
+              controls
+              autoPlay
+              className="h-full w-full object-contain"
+            />
+          ) : (
+            // ✅ Renderiza imagem
+            <img
+              key={currentIndex}
+              src={images[currentIndex]}
+              alt={`${name} - foto ${currentIndex + 1}`}
+              className="h-full w-full object-contain p-4"
+            />
+          )}
 
           {/* Seta esquerda */}
-          {images.length > 1 && (
-            <button
-              type="button"
-              onClick={goPrev}
-              className="absolute left-2 top-1/2 -translate-y-1/2 flex h-9 w-9 items-center justify-center rounded-full bg-background/80 text-foreground backdrop-blur transition hover:bg-background"
-            >
-              <ChevronLeft className="w-5 h-5" />
-            </button>
-          )}
+          <button
+            type="button"
+            onClick={goPrev}
+            className="absolute left-2 top-1/2 -translate-y-1/2 flex h-9 w-9 items-center justify-center rounded-full bg-background/80 text-foreground backdrop-blur transition hover:bg-background"
+          >
+            <ChevronLeft className="w-5 h-5" />
+          </button>
 
           {/* Seta direita */}
-          {images.length > 1 && (
-            <button
-              type="button"
-              onClick={goNext}
-              className="absolute right-2 top-1/2 -translate-y-1/2 flex h-9 w-9 items-center justify-center rounded-full bg-background/80 text-foreground backdrop-blur transition hover:bg-background"
-            >
-              <ChevronRight className="w-5 h-5" />
-            </button>
-          )}
+          <button
+            type="button"
+            onClick={goNext}
+            className="absolute right-2 top-1/2 -translate-y-1/2 flex h-9 w-9 items-center justify-center rounded-full bg-background/80 text-foreground backdrop-blur transition hover:bg-background"
+          >
+            <ChevronRight className="w-5 h-5" />
+          </button>
         </div>
 
-        {/* ✅ FIX: miniaturas apenas das imagens do produto correto */}
+        {/* Miniaturas — imagens + thumbnail do vídeo */}
         <div className="shrink-0 border-t border-border bg-card px-4 py-3">
           <div className="flex justify-center gap-2 overflow-x-auto pb-1">
+            {/* Miniaturas das imagens */}
             {images.map((img, i) => (
               <button
-                key={`${colorLabel}-${i}`} // key com colorLabel evita miniaturas erradas
+                key={`${colorLabel}-img-${i}`}
                 type="button"
-                onClick={() => setCurrentIndex(i)}
+                onClick={() => { setCurrentIndex(i); setShowVideo(false); }}
                 className={`h-14 w-14 flex-shrink-0 overflow-hidden rounded-lg border-2 transition-all md:h-16 md:w-16 ${
-                  i === safeIndex
+                  !showVideo && i === currentIndex
                     ? "border-accent scale-105"
                     : "border-transparent opacity-60 hover:opacity-100"
                 }`}
@@ -130,6 +164,17 @@ export default function ProductModal({
                 <img src={img} alt={`Miniatura ${i + 1}`} className="w-full h-full object-cover" />
               </button>
             ))}
+
+            {/* Miniatura do vídeo */}
+            <button
+              type="button"
+              onClick={() => setShowVideo(true)}
+              className={`h-14 w-14 flex-shrink-0 overflow-hidden rounded-lg border-2 transition-all md:h-16 md:w-16 flex items-center justify-center bg-muted ${
+                showVideo ? "border-accent scale-105" : "border-transparent opacity-60 hover:opacity-100"
+              }`}
+            >
+              <span className="text-2xl">▶️</span>
+            </button>
           </div>
         </div>
 

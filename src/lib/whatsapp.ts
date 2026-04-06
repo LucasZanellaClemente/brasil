@@ -1,5 +1,5 @@
 // ⚠️ Substitua pelo seu número com DDI+DDD, apenas números, sem símbolos
-export const WHATSAPP_NUMBER = "5511989422080";
+export const WHATSAPP_NUMBER = "5511970181620";
 
 const sanitizeWhatsAppNumber = (phoneNumber: string) =>
   phoneNumber.replace(/\D/g, "");
