@@ -211,7 +211,6 @@ const Index = () => {
       <section className="border-t border-border py-10 px-4">
         <div className="max-w-3xl mx-auto flex flex-col md:flex-row items-center justify-center gap-6 md:gap-10 text-muted-foreground font-body text-sm md:text-base">
           <span>✅ Entrega rápida</span>
-          <span>✅ Produto original</span>
           <span>✅ Atendimento via WhatsApp</span>
         </div>
       </section>
